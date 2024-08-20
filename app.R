@@ -32,8 +32,8 @@ server <- function(input, output, session){
   #call data once for entire dashboard
   #authentication step for Posit
   #this code was written by D Russ
-  source("./get_authentication.R", local = TRUE)
-  get_authentication(service_account_key = "SERVICE_ACCT_KEY")
+  #source("./get_authentication.R", local = TRUE)
+  #get_authentication(service_account_key = "SERVICE_ACCT_KEY")
   
   #load verified data
   verified_data <- reactive({
@@ -49,8 +49,7 @@ server <- function(input, output, session){
     req(verified_data())
     if(input$applyFilters){
       verified_data()%>%
-        filter((input$siteFilter == "." | d_827220437 == input$siteFilter) &
-                 (input$sexFilter == "." | sex == input$sexFilter) &
+        filter((input$sexFilter == "." | sex == input$sexFilter) &
                  (input$ageFilter == "." | age == input$ageFilter)&
                  (input$raceFilter == "." | race == input$raceFilter)&
                  (input$campaignFilter == "." | active_camptype == input$campaignFilter)&
@@ -139,8 +138,7 @@ server <- function(input, output, session){
     req(invited_participant_data())
     if(input$applyIPfilters){
       invited_participant_data()%>%
-        filter((input$IPsiteFilter == "." | site == input$IPsiteFilter) &
-                 (input$IPsexFilter == "." | sex == input$IPsexFilter) &
+        filter((input$IPsexFilter == "." | sex == input$IPsexFilter) &
                  (input$IPageFilter == "." | age == input$IPageFilter)&
                  (input$IPraceFilter == "." | race == input$IPraceFilter))
     }else{
@@ -176,77 +174,6 @@ server <- function(input, output, session){
   source("./sex_percentage_bar_chart.R", local = TRUE)
   output$invited_plot3b <- renderPlotly({sex_percentage_bar_chart(ip_sex_data = filtered_IP_data(), v_sex_data = filtered_verified_data())})
   
-  #aggregate metrics data
-  aggregate_recruitment_data <- reactive({
-    source("./get_data.R", local=TRUE)
-    source("./clean_data.R", local=TRUE)
-    aggregate_recruitment_data <- clean_data(get_data(project ="nih-nci-dceg-connect-bq2-prod",
-                                                    dataset = "StakeHolderMetrics_RS",
-                                                    table = "aggregate_recruitment"),
-                                                    type = "aggregate")
-  })
-  
-  source("./aggregate_race_grouped_bar_chart.R", local = TRUE)
-  output$aggregate_plot1 <- renderPlotly({aggregate_race_grouped_bar_chart(data = aggregate_recruitment_data())})
-  
-  source("./aggregate_race_scatter.R", local = TRUE)
-  output$aggregate_plot1b <- renderPlotly({aggregate_race_scatter(data = aggregate_recruitment_data())})
-  
-  source("./aggregate_sex_grouped_bar_chart.R", local = TRUE)
-  output$aggregate_plot2 <- renderPlotly({aggregate_sex_grouped_bar_chart(data = aggregate_recruitment_data())})
-  
-  source("./aggregate_sex_scatter.R", local = TRUE)
-  output$aggregate_plot2b <- renderPlotly({aggregate_sex_scatter(data = aggregate_recruitment_data())})
-  
-  source("./aggregate_insurance_grouped_bar_chart.R", local = TRUE)
-  output$aggregate_plot3 <- renderPlotly({aggregate_insurance_grouped_bar_chart(data = aggregate_recruitment_data())})
-  
-  source("./aggregate_insurance_scatter.R", local = TRUE)
-  output$aggregate_plot3b <- renderPlotly({aggregate_insurance_scatter(data = aggregate_recruitment_data())})
-  
-  source("./aggregate_ses_grouped_bar_chart.R", local = TRUE)
-  output$aggregate_plot4 <- renderPlotly({aggregate_ses_grouped_bar_chart(data = aggregate_recruitment_data())})
-  
-  source("./aggregate_ses_scatter.R", local = TRUE)
-  output$aggregate_plot4b <- renderPlotly({aggregate_ses_scatter(data = aggregate_recruitment_data())})
-  
-  source("./aggregate_ruca_grouped_bar_chart.R", local = TRUE)
-  output$aggregate_plot5 <- renderPlotly({aggregate_ruca_grouped_bar_chart(data = aggregate_recruitment_data())})
-  
-  source("./aggregate_ruca_scatter.R", local = TRUE)
-  output$aggregate_plot5b <- renderPlotly({aggregate_ruca_scatter(data = aggregate_recruitment_data())})
-  
-  
-  #HP aggregate data
-  # source("./hp_aggregate_race_grouped_bar_chart.R", local = TRUE)
-  # output$hp_aggregate_plot1 <- renderPlotly({hp_aggregate_race_grouped_bar_chart(data = aggregate_recruitment_data())})
-  # 
-  # source("./hp_aggregate_race_scatter.R", local = TRUE)
-  # output$hp_aggregate_plot1b <- renderPlotly({hp_aggregate_race_scatter(data = aggregate_recruitment_data())})
-  # 
-  # source("./hp_aggregate_sex_grouped_bar_chart.R", local = TRUE)
-  # output$hp_aggregate_plot2 <- renderPlotly({hp_aggregate_sex_grouped_bar_chart(data = aggregate_recruitment_data())})
-  # 
-  # source("./hp_aggregate_sex_scatter.R", local = TRUE)
-  # output$hp_aggregate_plot2b <- renderPlotly({hp_aggregate_sex_scatter(data = aggregate_recruitment_data())})
-  # 
-  # source("./hp_aggregate_insurance_grouped_bar_chart.R", local = TRUE)
-  # output$hp_aggregate_plot3 <- renderPlotly({hp_aggregate_insurance_grouped_bar_chart(data = aggregate_recruitment_data())})
-  # 
-  # source("./hp_aggregate_insurance_scatter.R", local = TRUE)
-  # output$hp_aggregate_plot3b <- renderPlotly({hp_aggregate_insurance_scatter(data = aggregate_recruitment_data())})
-  # 
-  # source("./hp_aggregate_ses_grouped_bar_chart.R", local = TRUE)
-  # output$hp_aggregate_plot4 <- renderPlotly({hp_aggregate_ses_grouped_bar_chart(data = aggregate_recruitment_data())})
-  # 
-  # source("./hp_aggregate_ses_scatter.R", local = TRUE)
-  # output$hp_aggregate_plot4b <- renderPlotly({hp_aggregate_ses_scatter(data = aggregate_recruitment_data())})
-  # 
-  # source("./hp_aggregate_ruca_grouped_bar_chart.R", local = TRUE)
-  # output$hp_aggregate_plot5 <- renderPlotly({hp_aggregate_ruca_grouped_bar_chart(data = aggregate_recruitment_data())})
-  # 
-  # source("./hp_aggregate_ruca_scatter.R", local = TRUE)
-  # output$hp_aggregate_plot5b <- renderPlotly({hp_aggregate_ruca_scatter(data = aggregate_recruitment_data())})
   
   
   fast_facts_reactive <- reactive({
@@ -310,9 +237,7 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Verified Participants", tabName = "verified_participants"),
-      menuItem("Invited Participants", tabName = "invited_participants"),
-      menuItem("Site-reported Recruitment", tabName = "site_reported_participants")
-    )
+      menuItem("Invited Participants", tabName = "invited_participants"))
   ),
   dashboardBody(
     tags$head(tags$style(HTML(custom_aesthetics))), 
@@ -368,20 +293,6 @@ ui <- dashboardPage(
               fluidRow(
                 column(4,
                        box(solidHeader = FALSE, title = "Choose Filters:", width = 12,
-                           selectInput("siteFilter", "Site",
-                                       choices = c("All" = ".",
-                                                   "HealthPartners" = 531629870,
-                                                   "Henry Ford Health System" = 548392715,
-                                                   "Kaiser Permanente Colorado" = 125001209,
-                                                   "Kaiser Permanente Georgia" = 327912200,
-                                                   "Kaiser Permanente Hawaii" = 300267574,
-                                                   "Kaiser Permanente Northwest" = 452412599,
-                                                   "Marshfield Clinic Health System" = 303349821,
-                                                   "Sanford Health" = 657167265, 
-                                                   "University of Chicago Medicine" = 809703864,
-                                                   "National Cancer Institute" = 517700004,
-                                                   "National Cancer Institute" = 13, "Other" = 181769837),
-                                       selected = "All"),
                            selectInput("sexFilter", "Gender",
                                        choices = c("All" = ".",
                                                    "Male" = "Male",
@@ -541,20 +452,6 @@ ui <- dashboardPage(
                                                    "WHITE, NON-HISPANIC" = "WHITE, NON-HISPANIC",
                                                    "NA" = "NA"),
                                        selected = "All"),
-                           selectInput("IPsiteFilter", "Site:",
-                                       choices = c("All" = ".",
-                                                   "HealthPartners" = 531629870,
-                                                   "Henry Ford Health System" = 548392715,
-                                                   "Kaiser Permanente Colorado" = 125001209,
-                                                   "Kaiser Permanente Georgia" = 327912200,
-                                                   "Kaiser Permanente Hawaii" = 300267574,
-                                                   "Kaiser Permanente Northwest" = 452412599,
-                                                   "Marshfield Clinic Health System" = 303349821,
-                                                   "Sanford Health" = 657167265, 
-                                                   "University of Chicago Medicine" = 809703864,
-                                                   "National Cancer Institute" = 517700004,
-                                                   "National Cancer Institute" = 13, "Other" = 181769837),
-                                       selected = "All"),
                            actionButton("applyIPfilters", "Apply Filters"),
                            br(),
                            textOutput("IP_rowCountText"))),
@@ -568,63 +465,6 @@ ui <- dashboardPage(
                 column(4, ),
                 column(4, plotlyOutput("invited_plot3")),
                 column(4, plotlyOutput("invited_plot3b")))
-      ),
-      tabItem(tabName = "site_reported_participants",
-              fluidRow(
-                column(12, align = "center", 
-                       tags$h3(style = "text-align: center;", 
-                               HTML(glue("2024 Q1 Site-reported Recruitment")))
-                )
-              ),
-              fluidRow(
-                column(12, align = "center", 
-                       tags$h5(style = "text-align: center;", 
-                               HTML(glue("Note: Extreme outliers have been removed")))
-                )
-              ),fluidRow(
-                column(12, align = "center", 
-                       tags$h5(style = "text-align: center;", 
-                               HTML(glue("Note: Extreme outliers have been removed.
-                                         All values shown are aggregate.")))
-                )
-              ),
-              fluidRow(
-                column(6, plotlyOutput("aggregate_plot1")),
-                column(6, plotlyOutput("aggregate_plot1b"))),
-              fluidRow(
-                column(6, plotlyOutput("aggregate_plot2")),
-                column(6, plotlyOutput("aggregate_plot2b"))),
-              fluidRow(
-                column(6, plotlyOutput("aggregate_plot3")),
-                column(6, plotlyOutput("aggregate_plot3b"))),
-              fluidRow(
-                column(6, plotlyOutput("aggregate_plot4")),
-                column(6, plotlyOutput("aggregate_plot4b"))),
-              fluidRow(
-                column(6, plotlyOutput("aggregate_plot5")),
-                column(6, plotlyOutput("aggregate_plot5b"))),
-              # fluidRow(
-              #   column(12,
-              #          h1("HealthPartners-reported Aggregate Recruitment Metrics", style = "color: black"),
-              #          div(style ="height: 15px; background-color: black; margin: 20px 0;"),  # Adjust the height and color
-              #          
-              #   )
-              # ),
-              # fluidRow(
-              #   column(6, plotlyOutput("hp_aggregate_plot1")),
-              #   column(6, plotlyOutput("hp_aggregate_plot1b"))),
-              # fluidRow(
-              #   column(6, plotlyOutput("hp_aggregate_plot2")),
-              #   column(6, plotlyOutput("hp_aggregate_plot2b"))),
-              # fluidRow(
-              #   column(6, plotlyOutput("hp_aggregate_plot3")),
-              #   column(6, plotlyOutput("hp_aggregate_plot3b"))),
-              # fluidRow(
-              #   column(6, plotlyOutput("hp_aggregate_plot4")),
-              #   column(6, plotlyOutput("hp_aggregate_plot4b"))),
-              # fluidRow(
-              #   column(6, plotlyOutput("hp_aggregate_plot5")),
-              #   column(6, plotlyOutput("hp_aggregate_plot5b")))
       )
       )
   )
